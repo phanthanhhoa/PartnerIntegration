@@ -5,6 +5,8 @@ using PartnerIntegration.Api.Configuration;
 using PartnerIntegration.Api.Extensions;
 using PartnerIntegration.Api.Exceptions;
 using PartnerIntegration.Api.Messaging;
+using PartnerIntegration.Api.Security;
+using Microsoft.OpenApi;
 using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,11 +36,33 @@ builder.Services.AddExceptionHandler<
     GlobalExceptionHandler>();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition(
+        "ApiKey",
+        new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.ApiKey,
+            Name = "X-API-Key",
+            In = ParameterLocation.Header,
+            Description = "Enter the API key."
+        });
+
+    options.AddSecurityRequirement(
+        document => new OpenApiSecurityRequirement
+        {
+            [new OpenApiSecuritySchemeReference(
+                "ApiKey",
+                document)] = []
+        });
+});
 
 var app = builder.Build();
 
 app.UseExceptionHandler();
+
+app.UseMiddleware<ApiKeyMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
