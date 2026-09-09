@@ -26,79 +26,26 @@ public sealed class PartnerTransactionsController
 
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromBody]
-        CreatePartnerTransactionRequest request,
+        [FromBody] CreatePartnerTransactionRequest request,
         CancellationToken cancellationToken)
     {
         var errors = _validator.Validate(request);
 
         if (errors.Count > 0)
         {
-            var problemDetails =
+            return BadRequest(
                 new ValidationProblemDetails(errors)
                 {
-                    Status =
-                        StatusCodes.Status400BadRequest,
-
-                    Title =
-                        "Validation failed"
-                };
-
-            return BadRequest(problemDetails);
-        }
-
-        try
-        {
-            var result =
-                await _transactionService.ProcessAsync(
-                    request,
-                    cancellationToken);
-
-            return Accepted(result);
-        }
-        catch (PartnerNotVerifiedException ex)
-        {
-            return BadRequest(
-                new ProblemDetails
-                {
-                    Status =
-                        StatusCodes.Status400BadRequest,
-
-                    Title =
-                        "Partner verification failed",
-
-                    Detail = ex.Message
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "Validation failed"
                 });
         }
-        catch (PartnerVerificationUnavailableException ex)
-        {
-            return StatusCode(
-                StatusCodes.Status503ServiceUnavailable,
-                new ProblemDetails
-                {
-                    Status =
-                        StatusCodes.Status503ServiceUnavailable,
 
-                    Title =
-                        "Partner verification unavailable",
+        var result =
+            await _transactionService.ProcessAsync(
+                request,
+                cancellationToken);
 
-                    Detail = ex.Message
-                });
-        }
-        catch (MessagePublishingException ex)
-        {
-            return StatusCode(
-                StatusCodes.Status503ServiceUnavailable,
-                new ProblemDetails
-                {
-                    Status =
-                        StatusCodes.Status503ServiceUnavailable,
-
-                    Title =
-                        "Message broker unavailable",
-
-                    Detail = ex.Message
-                });
-        }
+        return Accepted(result);
     }
 }

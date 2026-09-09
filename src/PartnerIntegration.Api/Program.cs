@@ -3,6 +3,7 @@ using PartnerIntegration.Api.Services;
 using PartnerIntegration.Api.Validation;
 using PartnerIntegration.Api.Configuration;
 using PartnerIntegration.Api.Extensions;
+using PartnerIntegration.Api.Exceptions;
 using PartnerIntegration.Api.Messaging;
 using Polly;
 
@@ -27,10 +28,17 @@ builder.Services.AddSingleton<
 builder.Services.AddPartnerVerification(
     builder.Configuration);
 
+builder.Services.AddProblemDetails();
+
+builder.Services.AddExceptionHandler<
+    GlobalExceptionHandler>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
