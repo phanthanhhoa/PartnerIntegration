@@ -4,7 +4,7 @@ using PartnerIntegration.Api.Contracts;
 namespace PartnerIntegration.Api.Controllers;
 
 [ApiController]
-[Route("mock/partners")]
+[Route("api/v1/mock/partners")]
 public sealed class MockPartnerVerificationController : ControllerBase
 {
     [HttpGet("{partnerId}/verify")]
