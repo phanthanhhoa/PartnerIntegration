@@ -1,10 +1,21 @@
 using PartnerIntegration.Api.Validation;
+using PartnerIntegration.Api.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
 builder.Services.AddSingleton<TransactionRequestValidator>();
+builder.Services.AddHttpClient<
+    IPartnerVerificationClient,
+    PartnerVerificationClient>(client =>
+{
+    client.BaseAddress =
+        new Uri("http://localhost:8080");
+
+    client.Timeout =
+        TimeSpan.FromSeconds(3);
+});
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
