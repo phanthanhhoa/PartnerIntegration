@@ -1,6 +1,6 @@
-using Xunit;
 using PartnerIntegration.Api.Contracts;
 using PartnerIntegration.Api.Validation;
+using Xunit;
 
 namespace PartnerIntegration.Tests.Validation;
 
@@ -11,7 +11,9 @@ public sealed class TransactionRequestValidatorTests
     [Fact]
     public void Validate_Should_ReturnNoErrors_When_RequestIsValid()
     {
-        var errors = _validator.Validate(CreateValidRequest());
+        var request = CreateValidRequest();
+
+        var errors = _validator.Validate(request);
 
         Assert.Empty(errors);
     }
@@ -19,12 +21,15 @@ public sealed class TransactionRequestValidatorTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Validate_Should_ReturnError_When_AmountIsNotPositive(decimal amount)
+    [InlineData(-100)]
+    public void Validate_Should_ReturnError_When_AmountIsNotPositive(
+        decimal amount)
     {
-        var request = CreateValidRequest() with
-        {
-            Amount = amount
-        };
+        var request =
+            CreateValidRequest() with
+            {
+                Amount = amount
+            };
 
         var errors = _validator.Validate(request);
 
@@ -34,10 +39,11 @@ public sealed class TransactionRequestValidatorTests
     [Fact]
     public void Validate_Should_ReturnError_When_CurrencyIsInvalid()
     {
-        var request = CreateValidRequest() with
-        {
-            Currency = "ABC"
-        };
+        var request =
+            CreateValidRequest() with
+            {
+                Currency = "ABC"
+            };
 
         var errors = _validator.Validate(request);
 
@@ -47,12 +53,13 @@ public sealed class TransactionRequestValidatorTests
     [Fact]
     public void Validate_Should_ReturnErrors_When_RequiredFieldsAreMissing()
     {
-        var request = new CreatePartnerTransactionRequest(
-            null,
-            null,
-            100,
-            null,
-            null);
+        var request =
+            new CreatePartnerTransactionRequest(
+                null,
+                null,
+                100,
+                null,
+                null);
 
         var errors = _validator.Validate(request);
 
@@ -62,13 +69,15 @@ public sealed class TransactionRequestValidatorTests
         Assert.Contains("timestamp", errors.Keys);
     }
 
-    private static CreatePartnerTransactionRequest CreateValidRequest()
+    private static CreatePartnerTransactionRequest
+        CreateValidRequest()
     {
         return new CreatePartnerTransactionRequest(
             "P-1001",
             "TXN-99823",
-            250.00m,
+            250m,
             "USD",
-            DateTimeOffset.Parse("2024-05-10T14:30:00Z"));
+            DateTimeOffset.Parse(
+                "2024-05-10T14:30:00Z"));
     }
 }
