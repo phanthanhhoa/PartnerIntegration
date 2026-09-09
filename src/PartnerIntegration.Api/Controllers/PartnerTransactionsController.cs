@@ -54,7 +54,7 @@ public sealed class PartnerTransactionsController
                     request,
                     cancellationToken);
 
-            return Ok(result);
+            return Accepted(result);
         }
         catch (PartnerNotVerifiedException ex)
         {
@@ -81,6 +81,21 @@ public sealed class PartnerTransactionsController
 
                     Title =
                         "Partner verification unavailable",
+
+                    Detail = ex.Message
+                });
+        }
+        catch (MessagePublishingException ex)
+        {
+            return StatusCode(
+                StatusCodes.Status503ServiceUnavailable,
+                new ProblemDetails
+                {
+                    Status =
+                        StatusCodes.Status503ServiceUnavailable,
+
+                    Title =
+                        "Message broker unavailable",
 
                     Detail = ex.Message
                 });

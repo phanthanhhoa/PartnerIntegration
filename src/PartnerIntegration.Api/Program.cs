@@ -1,6 +1,8 @@
 using PartnerIntegration.Api.Clients;
 using PartnerIntegration.Api.Services;
 using PartnerIntegration.Api.Validation;
+using PartnerIntegration.Api.Configuration;
+using PartnerIntegration.Api.Messaging;
 using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +14,14 @@ builder.Services.AddSingleton<TransactionRequestValidator>();
 builder.Services.AddScoped<
     IPartnerTransactionService,
     PartnerTransactionService>();
+
+builder.Services.Configure<RabbitMqOptions>(
+builder.Configuration.GetSection(
+    RabbitMqOptions.SectionName));
+
+builder.Services.AddSingleton<
+    IMessagePublisher,
+    RabbitMqMessagePublisher>();
 
 builder.Services
     .AddHttpClient<
