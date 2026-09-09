@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+
+.git/
+.gitignore
+
+.vs/
+.idea/
+
+TestResults/
+coverage/
+
+.env
+
+.DS_Store

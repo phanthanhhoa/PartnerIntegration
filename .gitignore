@@ -1,5 +1,7 @@
 bin/
 obj/
+.git/
+.env
 .vs/
 .idea/
 *.user
